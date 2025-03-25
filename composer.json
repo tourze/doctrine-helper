@@ -18,5 +18,9 @@
     "psr-4": {
       "Tourze\\DoctrineHelper\\Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "phpunit",
+    "test-coverage": "phpunit --coverage-html coverage"
   }
 }
