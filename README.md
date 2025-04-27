@@ -1,83 +1,96 @@
 # Doctrine Helper
 
-这个库提供了一系列实用的帮助函数，用于简化Doctrine ORM的使用。
+[![Latest Version](https://img.shields.io/packagist/v/tourze/doctrine-helper.svg)](https://packagist.org/packages/tourze/doctrine-helper)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## 功能
+A lightweight helper library to simplify and optimize your usage of Doctrine ORM in PHP projects.
 
-- `CacheHelper`: 提供缓存相关的辅助函数，如获取实体类对应的缓存标签
-- `EntityDetector`: 用于检测一个类是否为Doctrine实体
-- `ReflectionHelper`: 提供反射相关的辅助函数，简化Doctrine实体的属性和注解操作
+## Features
 
-## 安装
+- **CacheHelper**: Generate cache IDs and tags for Doctrine entities and objects.
+- **EntityDetector**: Determine whether a class is a Doctrine entity.
+- **ReflectionHelper**: Simplify reflection operations for Doctrine entities, properties, and custom attributes, with caching for performance.
+
+## Installation
+
+- Requires PHP >= 8.1
+- Requires doctrine/orm >= 2.20 or >= 3.0
+- Requires doctrine/common >= 3.5
+
+Install via Composer:
 
 ```bash
 composer require tourze/doctrine-helper
 ```
 
-## 使用示例
+## Quick Start
 
-### CacheHelper
+### CacheHelper Example
 
 ```php
 use Tourze\DoctrineHelper\CacheHelper;
 
-// 获取类名对应的缓存ID
+// Get cache ID for a class
 $cacheId = CacheHelper::getClassId(User::class);
 
-// 获取类名的缓存标签
+// Get cache tags for a class
 $tags = CacheHelper::getClassTags(User::class);
 
-// 带ID的缓存标签
+// Get cache tags for a class with ID
 $tagsWithId = CacheHelper::getClassTags(User::class, 1);
 
-// 获取对象的缓存标签
+// Get cache tags for an object
 $objectTags = CacheHelper::getObjectTags($user);
 ```
 
-### EntityDetector
+### EntityDetector Example
 
 ```php
 use Tourze\DoctrineHelper\EntityDetector;
 
-// 检查类是否为Doctrine实体
+// Check if a class is a Doctrine entity
 if (EntityDetector::isEntityClass(User::class)) {
-    // 这是一个实体类
+    // This is a Doctrine entity
 }
 ```
 
-### ReflectionHelper
+### ReflectionHelper Example
 
 ```php
 use Tourze\DoctrineHelper\ReflectionHelper;
 
-// 获取类的反射对象
+// Get class reflection
 $reflection = ReflectionHelper::getClassReflection(User::class);
 
-// 获取属性的反射对象
+// Get property reflection
 $property = ReflectionHelper::getReflectionProperty($user, 'email');
 
-// 获取所有属性
+// Get all properties
 $properties = ReflectionHelper::getProperties(User::class);
 
-// 获取所有方法
+// Get all methods
 $methods = ReflectionHelper::getMethods(User::class);
 
-// 获取属性上的注解
+// Get property attributes
 $attributes = ReflectionHelper::getPropertyAttributes($reflection, SomeAttribute::class);
 ```
 
-## 运行测试
+## Documentation
 
-本库使用PHPUnit进行单元测试。您可以通过以下方式运行测试：
+- See source code and unit tests for detailed API usage.
+- Attribute and annotation reading supported.
+- Reflection caching optimizes performance.
 
-```bash
-composer test
-```
+## Contributing
 
-要生成测试覆盖率报告，请运行：
+- Issues and pull requests are welcome.
+- Follow PSR-12 coding style.
+- Ensure all PHPUnit tests pass before submitting.
 
-```bash
-composer test-coverage
-```
+## License
 
-这将在`coverage`目录中生成HTML格式的覆盖率报告。
+MIT License. See [LICENSE](LICENSE) for details.
+
+## Changelog
+
+See Git commit history for changes and releases.
