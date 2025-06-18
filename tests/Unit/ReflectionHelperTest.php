@@ -7,21 +7,37 @@ use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\ReflectionHelper;
 
 #[ORM\Entity]
-class TestReflectionEntity
+#[ORM\Table(name: 'test_reflection_entity', options: ['comment' => 'Test Reflection Entity'])]
+class TestReflectionEntity implements \Stringable
 {
     private int $id = 1;
     protected string $name = 'test';
     public array $data = [];
 
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
     // 添加一个方法，以便测试
     public function someMethod(): void
     {
+    }
+
+    public function __toString(): string
+    {
+        return 'TestReflectionEntity';
     }
 }
 
 class ChildTestEntity extends TestReflectionEntity
 {
     private string $childProperty = 'child';
+
+    public function getChildProperty(): string
+    {
+        return $this->childProperty;
+    }
 }
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY)]
@@ -39,6 +55,22 @@ class ClassWithAttributes
     
     #[TestAttribute(value: 'property2')]
     private string $property2;
+
+    public function __construct()
+    {
+        $this->property1 = 'prop1';
+        $this->property2 = 'prop2';
+    }
+
+    public function getProperty1(): string
+    {
+        return $this->property1;
+    }
+
+    public function getProperty2(): string
+    {
+        return $this->property2;
+    }
 }
 
 #[TestAttribute(value: 'class')]
@@ -75,7 +107,6 @@ class ReflectionHelperTest extends TestCase
     {
         $object = new ChildTestEntity();
         $properties = ReflectionHelper::getProperties($object);
-        $this->assertIsArray($properties);
         $this->assertCount(4, $properties);
         $this->assertArrayHasKey('id', $properties);
         $this->assertArrayHasKey('name', $properties);
@@ -87,7 +118,6 @@ class ReflectionHelperTest extends TestCase
     {
         $object = new TestReflectionEntity();
         $methods = ReflectionHelper::getMethods($object);
-        $this->assertIsArray($methods);
         // 检查是否包含了someMethod方法
         $methodExists = false;
         foreach ($methods as $method) {
@@ -103,7 +133,6 @@ class ReflectionHelperTest extends TestCase
     {
         $reflectionClass = new \ReflectionClass(ChildTestEntity::class);
         $parentClasses = ReflectionHelper::getParentClasses($reflectionClass);
-        $this->assertIsArray($parentClasses);
         $this->assertContains(ChildTestEntity::class, $parentClasses);
         $this->assertContains(TestReflectionEntity::class, $parentClasses);
     }
@@ -112,7 +141,6 @@ class ReflectionHelperTest extends TestCase
     {
         $reflectionClass = new \ReflectionClass(ClassWithAttributes::class);
         $attributes = ReflectionHelper::getPropertyAttributes($reflectionClass, TestAttribute::class);
-        $this->assertIsArray($attributes);
         $this->assertCount(2, $attributes);
         $this->assertInstanceOf(TestAttribute::class, $attributes[0]);
         $this->assertEquals('property1', $attributes[0]->value);

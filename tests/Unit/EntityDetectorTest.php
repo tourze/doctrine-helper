@@ -7,8 +7,13 @@ use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\EntityDetector;
 
 #[ORM\Entity]
-class TestEntity
+#[ORM\Table(name: 'test_entity', options: ['comment' => 'Test Entity'])]
+class TestEntity implements \Stringable
 {
+    public function __toString(): string
+    {
+        return 'TestEntity';
+    }
 }
 
 class NotAnEntity

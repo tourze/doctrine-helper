@@ -15,11 +15,11 @@ class ReflectionHelper
 
     private static function getOrSetCache(string $key, callable $callback): mixed
     {
-        if (!isset(static::$cacheItems[$key])) {
-            static::$cacheItems[$key] = $callback();
+        if (!isset(self::$cacheItems[$key])) {
+            self::$cacheItems[$key] = $callback();
         }
 
-        return static::$cacheItems[$key];
+        return self::$cacheItems[$key];
     }
 
     /**
@@ -30,7 +30,7 @@ class ReflectionHelper
     public static function getClassReflection(object|string $object): \ReflectionClass
     {
         $className = is_object($object) ? ClassUtils::getClass($object) : strval($object);
-        return static::$cacheItems['classReflection_' . md5($className)] ??= new \ReflectionClass($className);
+        return self::$cacheItems['classReflection_' . md5($className)] ??= new \ReflectionClass($className);
     }
 
     public static function getReflectionProperty(object $object, string $propertyName): ?\ReflectionProperty
@@ -50,7 +50,7 @@ class ReflectionHelper
     {
         $className = is_object($object) ? ClassUtils::getClass($object) : strval($object);
 
-        return static::getOrSetCache('classProperty_' . md5(serialize([$className, $filter])), function () use ($className, $filter) {
+        return self::getOrSetCache('classProperty_' . md5(serialize([$className, $filter])), function () use ($className, $filter) {
             $propertiesArray = [];
 
             $reflectionClass = static::getClassReflection($className);
@@ -76,7 +76,7 @@ class ReflectionHelper
     public static function getMethods(object|string $object, $filter = null): array
     {
         $className = is_object($object) ? ClassUtils::getClass($object) : strval($object);
-        return static::$cacheItems['classMethod_' . md5(serialize([$className, $filter]))] ??= static::getClassReflection($className)->getMethods($filter);
+        return self::$cacheItems['classMethod_' . md5(serialize([$className, $filter]))] ??= static::getClassReflection($className)->getMethods($filter);
     }
 
     /**
@@ -107,7 +107,6 @@ class ReflectionHelper
         $rs = [];
         foreach ($reflectionClass->getProperties() as $property) {
             foreach ($property->getAttributes($attributeName) as $attribute) {
-                /** @var \ReflectionAttribute $attribute */
                 $rs[] = $attribute->newInstance();
             }
         }
@@ -136,12 +135,12 @@ class ReflectionHelper
      * @template T of object
      * @param \ReflectionClass $reflectionClass
      * @param class-string<T> $attributeName
-     * @return iterable<T>
+     * @return \Traversable<T>
      */
     public static function getClassAttributes(\ReflectionClass $reflectionClass, string $attributeName): Traversable
     {
         foreach ($reflectionClass->getAttributes($attributeName) as $attribute) {
-            /** @var \ReflectionAttribute $attribute */
+            /** @var \ReflectionAttribute<T> $attribute */
             yield $attribute->newInstance();
         }
     }
