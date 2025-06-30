@@ -2,19 +2,9 @@
 
 namespace Tourze\DoctrineHelper\Tests\Unit;
 
-use Doctrine\ORM\Mapping as ORM;
 use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\EntityDetector;
-
-#[ORM\Entity]
-#[ORM\Table(name: 'test_entity', options: ['comment' => 'Test Entity'])]
-class TestEntity implements \Stringable
-{
-    public function __toString(): string
-    {
-        return 'TestEntity';
-    }
-}
+use Tourze\DoctrineHelper\Tests\Unit\Entity\TestEntity;
 
 class NotAnEntity
 {
@@ -29,7 +19,7 @@ class EntityDetectorTest extends TestCase
 
     public function testIsEntityClassWithEntity(): void
     {
-        $this->markTestSkipped('由于依赖注解类，这个测试暂时跳过');
+        $this->assertTrue(EntityDetector::isEntityClass(TestEntity::class));
     }
 
     public function testIsEntityClassWithNonEntity(): void

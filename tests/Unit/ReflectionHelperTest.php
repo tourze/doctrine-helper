@@ -5,48 +5,9 @@ namespace Tourze\DoctrineHelper\Tests\Unit;
 use Doctrine\ORM\Mapping as ORM;
 use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\ReflectionHelper;
-
-#[ORM\Entity]
-#[ORM\Table(name: 'test_reflection_entity', options: ['comment' => 'Test Reflection Entity'])]
-class TestReflectionEntity implements \Stringable
-{
-    private int $id = 1;
-    protected string $name = 'test';
-    public array $data = [];
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    // 添加一个方法，以便测试
-    public function someMethod(): void
-    {
-    }
-
-    public function __toString(): string
-    {
-        return 'TestReflectionEntity';
-    }
-}
-
-class ChildTestEntity extends TestReflectionEntity
-{
-    private string $childProperty = 'child';
-
-    public function getChildProperty(): string
-    {
-        return $this->childProperty;
-    }
-}
-
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_PROPERTY)]
-class TestAttribute
-{
-    public function __construct(public string $value = '')
-    {
-    }
-}
+use Tourze\DoctrineHelper\Tests\Unit\Attribute\TestAttribute;
+use Tourze\DoctrineHelper\Tests\Unit\Entity\ChildTestEntity;
+use Tourze\DoctrineHelper\Tests\Unit\Entity\TestReflectionEntity;
 
 class ClassWithAttributes
 {
