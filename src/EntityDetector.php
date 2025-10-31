@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tourze\DoctrineHelper;
 
 use Doctrine\Common\Util\ClassUtils;
@@ -12,10 +14,16 @@ class EntityDetector
      */
     public static function isEntityClass(string $className): bool
     {
+        if (!class_exists($className)) {
+            return false;
+        }
+
         $className = ClassUtils::getRealClass($className);
-        if (class_exists($className) && ReflectionHelper::hasClassAttributes(ReflectionHelper::getClassReflection($className), ORM\Entity::class)) {
+        $reflectionClass = new \ReflectionClass($className);
+        if (ReflectionHelper::hasClassAttributes($reflectionClass, ORM\Entity::class)) {
             return true;
         }
+
         return false;
     }
 }
