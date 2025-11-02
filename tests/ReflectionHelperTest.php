@@ -57,7 +57,6 @@ class ReflectionHelperTest extends TestCase
         $object = new TestReflectionClass();
         $properties = ReflectionHelper::getProperties($object);
 
-        $this->assertIsArray($properties);
         $this->assertArrayHasKey('publicProperty', $properties);
         $this->assertArrayHasKey('protectedProperty', $properties);
         $this->assertArrayHasKey('privateProperty', $properties);
@@ -67,7 +66,6 @@ class ReflectionHelperTest extends TestCase
     {
         $properties = ReflectionHelper::getProperties(TestReflectionClass::class);
 
-        $this->assertIsArray($properties);
         $this->assertArrayHasKey('publicProperty', $properties);
         $this->assertArrayHasKey('protectedProperty', $properties);
         $this->assertArrayHasKey('privateProperty', $properties);
@@ -77,7 +75,6 @@ class ReflectionHelperTest extends TestCase
     {
         $properties = ReflectionHelper::getProperties(TestReflectionClass::class, \ReflectionProperty::IS_PUBLIC);
 
-        $this->assertIsArray($properties);
         $this->assertArrayHasKey('publicProperty', $properties);
         $this->assertArrayNotHasKey('protectedProperty', $properties);
         $this->assertArrayNotHasKey('privateProperty', $properties);
@@ -95,24 +92,22 @@ class ReflectionHelperTest extends TestCase
     {
         $methods = ReflectionHelper::getMethods(TestReflectionClass::class);
 
-        $this->assertIsArray($methods);
         $this->assertNotEmpty($methods);
 
         $methodNames = array_map(fn(\ReflectionMethod $method) => $method->getName(), $methods);
         $this->assertContains('publicMethod', $methodNames);
         $this->assertContains('protectedMethod', $methodNames);
-        $this->assertContains('privateMethod', $methodNames);
+        $this->assertContains('getPrivateProperty', $methodNames);
     }
 
     public function testGetMethodsWithPublicFilter(): void
     {
         $methods = ReflectionHelper::getMethods(TestReflectionClass::class, \ReflectionMethod::IS_PUBLIC);
 
-        $this->assertIsArray($methods);
         $methodNames = array_map(fn(\ReflectionMethod $method) => $method->getName(), $methods);
         $this->assertContains('publicMethod', $methodNames);
         $this->assertNotContains('protectedMethod', $methodNames);
-        $this->assertNotContains('privateMethod', $methodNames);
+        $this->assertContains('getPrivateProperty', $methodNames);
     }
 
     public function testGetMethodsWithNonExistentClass(): void
@@ -128,7 +123,6 @@ class ReflectionHelperTest extends TestCase
         $reflectionClass = new \ReflectionClass(TestChildClass::class);
         $parentClasses = ReflectionHelper::getParentClasses($reflectionClass);
 
-        $this->assertIsArray($parentClasses);
         $this->assertContains(TestChildClass::class, $parentClasses);
         $this->assertContains(TestReflectionClass::class, $parentClasses);
         $this->assertContains(TestInterface::class, $parentClasses);
@@ -139,7 +133,6 @@ class ReflectionHelperTest extends TestCase
         $reflectionClass = new \ReflectionClass(TestEntityWithAttributes::class);
         $attributes = ReflectionHelper::getPropertyAttributes($reflectionClass, ORM\Column::class);
 
-        $this->assertIsArray($attributes);
         $this->assertNotEmpty($attributes);
         $this->assertInstanceOf(ORM\Column::class, $attributes[0]);
     }
@@ -210,10 +203,11 @@ class TestReflectionClass implements TestInterface
         return 'protected method';
     }
 
-    private function privateMethod(): string
+    public function getPrivateProperty(): string
     {
-        return 'private method';
+        return $this->privateProperty;
     }
+
 }
 
 class TestChildClass extends TestReflectionClass

@@ -132,6 +132,9 @@ class TestEntityWithoutGetId
 
 class TestEntityWithNonScalarId
 {
+    /**
+     * @return array<string, string>
+     */
     public function getId(): array
     {
         return ['complex' => 'id'];
