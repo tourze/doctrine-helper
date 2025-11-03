@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace Tourze\DoctrineHelper\Tests;
 
-use Doctrine\ORM\Mapping as ORM;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\CacheHelper;
+use Tourze\DoctrineHelper\Tests\Fixtures\Entity\TestEntityWithTable;
+use Tourze\DoctrineHelper\Tests\Fixtures\Model\TestEntityWithId;
+use Tourze\DoctrineHelper\Tests\Fixtures\Model\TestEntityWithNonScalarId;
+use Tourze\DoctrineHelper\Tests\Fixtures\Model\TestEntityWithoutGetId;
+use Tourze\DoctrineHelper\Tests\Fixtures\Model\TestEntityWithoutTable;
 
+/**
+ * @internal
+ */
+#[CoversClass(CacheHelper::class)]
 class CacheHelperTest extends TestCase
 {
     public function testGetClassIdWithNonExistentClass(): void
     {
-        $className = 'NonExistent\\Class\\Name';
+        $className = 'NonExistent\Class\Name';
         $result = CacheHelper::getClassId($className);
 
         $expected = 'NonExistent_Class_Name';
@@ -24,7 +33,7 @@ class CacheHelperTest extends TestCase
         $className = TestEntityWithoutTable::class;
         $result = CacheHelper::getClassId($className);
 
-        $expected = 'Tourze_DoctrineHelper_Tests_TestEntityWithoutTable';
+        $expected = 'Tourze_DoctrineHelper_Tests_Fixtures_Model_TestEntityWithoutTable';
         $this->assertSame($expected, $result);
     }
 
@@ -63,7 +72,7 @@ class CacheHelperTest extends TestCase
 
         $result = CacheHelper::getObjectTags($object);
 
-        $expected = 'Tourze_DoctrineHelper_Tests_TestEntityWithId_456';
+        $expected = 'Tourze_DoctrineHelper_Tests_Fixtures_Model_TestEntityWithId_456';
         $this->assertSame($expected, $result);
     }
 
@@ -74,7 +83,7 @@ class CacheHelperTest extends TestCase
 
         $result = CacheHelper::getObjectTags($object);
 
-        $expected = 'Tourze_DoctrineHelper_Tests_TestEntityWithId';
+        $expected = 'Tourze_DoctrineHelper_Tests_Fixtures_Model_TestEntityWithId';
         $this->assertSame($expected, $result);
     }
 
@@ -96,47 +105,5 @@ class CacheHelperTest extends TestCase
         $this->expectExceptionMessage('Entity ID must be scalar');
 
         CacheHelper::getObjectTags($object);
-    }
-}
-
-// Test helper classes
-
-class TestEntityWithoutTable
-{
-}
-
-#[ORM\Entity]
-#[ORM\Table(name: 'test_table')]
-class TestEntityWithTable
-{
-}
-
-class TestEntityWithId
-{
-    private ?int $id = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-}
-
-class TestEntityWithoutGetId
-{
-}
-
-class TestEntityWithNonScalarId
-{
-    /**
-     * @return array<string, string>
-     */
-    public function getId(): array
-    {
-        return ['complex' => 'id'];
     }
 }

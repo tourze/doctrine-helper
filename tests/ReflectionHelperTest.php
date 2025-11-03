@@ -5,13 +5,24 @@ declare(strict_types=1);
 namespace Tourze\DoctrineHelper\Tests;
 
 use Doctrine\ORM\Mapping as ORM;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\ReflectionHelper;
+use Tourze\DoctrineHelper\Tests\Fixtures\Entity\TestEntityWithAttributes;
+use Tourze\DoctrineHelper\Tests\Fixtures\Reflection\TestChildClass;
+use Tourze\DoctrineHelper\Tests\Fixtures\Reflection\TestConcreteReflectionClass;
+use Tourze\DoctrineHelper\Tests\Fixtures\Reflection\TestInterface;
+use Tourze\DoctrineHelper\Tests\Fixtures\Reflection\TestReflectionClass;
 
+/**
+ * @internal
+ */
+#[CoversClass(ReflectionHelper::class)]
 class ReflectionHelperTest extends TestCase
 {
     public function testGetClassReflectionWithString(): void
     {
+        // @phpstan-ignore-next-line 测试覆盖已废弃方法，按需保留
         $reflectionClass = ReflectionHelper::getClassReflection(TestReflectionClass::class);
 
         $this->assertInstanceOf(\ReflectionClass::class, $reflectionClass);
@@ -20,24 +31,25 @@ class ReflectionHelperTest extends TestCase
 
     public function testGetClassReflectionWithObject(): void
     {
-        $object = new TestReflectionClass();
+        $object = new TestConcreteReflectionClass();
+        // @phpstan-ignore-next-line 测试覆盖已废弃方法，按需保留
         $reflectionClass = ReflectionHelper::getClassReflection($object);
 
         $this->assertInstanceOf(\ReflectionClass::class, $reflectionClass);
-        $this->assertSame(TestReflectionClass::class, $reflectionClass->getName());
+        $this->assertSame(TestConcreteReflectionClass::class, $reflectionClass->getName());
     }
 
     public function testGetClassReflectionWithNonExistentClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Class 'NonExistent\\Class\\Name' does not exist");
-
-        ReflectionHelper::getClassReflection('NonExistent\\Class\\Name');
+        // @phpstan-ignore-next-line 测试覆盖已废弃方法，验证异常
+        ReflectionHelper::getClassReflection('NonExistent\Class\Name');
     }
 
     public function testGetReflectionPropertyWithExistingProperty(): void
     {
-        $object = new TestReflectionClass();
+        $object = new TestConcreteReflectionClass();
         $property = ReflectionHelper::getReflectionProperty($object, 'publicProperty');
 
         $this->assertInstanceOf(\ReflectionProperty::class, $property);
@@ -46,7 +58,7 @@ class ReflectionHelperTest extends TestCase
 
     public function testGetReflectionPropertyWithNonExistentProperty(): void
     {
-        $object = new TestReflectionClass();
+        $object = new TestConcreteReflectionClass();
         $property = ReflectionHelper::getReflectionProperty($object, 'nonExistentProperty');
 
         $this->assertNull($property);
@@ -54,7 +66,7 @@ class ReflectionHelperTest extends TestCase
 
     public function testGetPropertiesWithObjectDefaultFilter(): void
     {
-        $object = new TestReflectionClass();
+        $object = new TestConcreteReflectionClass();
         $properties = ReflectionHelper::getProperties($object);
 
         $this->assertArrayHasKey('publicProperty', $properties);
@@ -85,7 +97,7 @@ class ReflectionHelperTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Class 'NonExistent\\Class\\Name' does not exist");
 
-        ReflectionHelper::getProperties('NonExistent\\Class\\Name');
+        ReflectionHelper::getProperties('NonExistent\Class\Name');
     }
 
     public function testGetMethodsWithDefaultFilter(): void
@@ -94,7 +106,7 @@ class ReflectionHelperTest extends TestCase
 
         $this->assertNotEmpty($methods);
 
-        $methodNames = array_map(fn(\ReflectionMethod $method) => $method->getName(), $methods);
+        $methodNames = array_map(fn (\ReflectionMethod $method) => $method->getName(), $methods);
         $this->assertContains('publicMethod', $methodNames);
         $this->assertContains('protectedMethod', $methodNames);
         $this->assertContains('getPrivateProperty', $methodNames);
@@ -104,7 +116,7 @@ class ReflectionHelperTest extends TestCase
     {
         $methods = ReflectionHelper::getMethods(TestReflectionClass::class, \ReflectionMethod::IS_PUBLIC);
 
-        $methodNames = array_map(fn(\ReflectionMethod $method) => $method->getName(), $methods);
+        $methodNames = array_map(fn (\ReflectionMethod $method) => $method->getName(), $methods);
         $this->assertContains('publicMethod', $methodNames);
         $this->assertNotContains('protectedMethod', $methodNames);
         $this->assertContains('getPrivateProperty', $methodNames);
@@ -115,7 +127,7 @@ class ReflectionHelperTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Class 'NonExistent\\Class\\Name' does not exist");
 
-        ReflectionHelper::getMethods('NonExistent\\Class\\Name');
+        ReflectionHelper::getMethods('NonExistent\Class\Name');
     }
 
     public function testGetParentClasses(): void
@@ -179,51 +191,4 @@ class ReflectionHelperTest extends TestCase
 
         $this->assertFalse($hasAttribute);
     }
-}
-
-// Test helper classes
-
-interface TestInterface
-{
-}
-
-class TestReflectionClass implements TestInterface
-{
-    public string $publicProperty = 'public';
-    protected string $protectedProperty = 'protected';
-    private string $privateProperty = 'private';
-
-    public function publicMethod(): string
-    {
-        return 'public method';
-    }
-
-    protected function protectedMethod(): string
-    {
-        return 'protected method';
-    }
-
-    public function getPrivateProperty(): string
-    {
-        return $this->privateProperty;
-    }
-
-}
-
-class TestChildClass extends TestReflectionClass
-{
-    public string $childProperty = 'child';
-}
-
-#[ORM\Entity]
-#[ORM\Table(name: 'test_entity_with_attributes')]
-class TestEntityWithAttributes
-{
-    #[ORM\Column(type: 'string')]
-    public string $name = '';
-
-    #[ORM\Column(type: 'integer')]
-    public int $age = 0;
-
-    public string $noAttribute = '';
 }

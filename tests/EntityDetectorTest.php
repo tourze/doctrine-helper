@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace Tourze\DoctrineHelper\Tests;
 
-use Doctrine\ORM\Mapping as ORM;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Tourze\DoctrineHelper\EntityDetector;
+use Tourze\DoctrineHelper\Tests\Fixtures\Entity\TestEntityClass;
+use Tourze\DoctrineHelper\Tests\Fixtures\Entity\TestEntityClassWithTable;
+use Tourze\DoctrineHelper\Tests\Fixtures\Model\TestNonEntityClass;
 
+/**
+ * @internal
+ */
+#[CoversClass(EntityDetector::class)]
 class EntityDetectorTest extends TestCase
 {
     public function testIsEntityClassWithNonExistentClass(): void
     {
-        $className = 'NonExistent\\Class\\Name';
+        $className = 'NonExistent\Class\Name';
         $result = EntityDetector::isEntityClass($className);
 
         $this->assertFalse($result);
@@ -41,21 +48,4 @@ class EntityDetectorTest extends TestCase
 
         $this->assertTrue($result);
     }
-}
-
-// Test helper classes
-
-class TestNonEntityClass
-{
-}
-
-#[ORM\Entity]
-class TestEntityClass
-{
-}
-
-#[ORM\Entity]
-#[ORM\Table(name: 'test_entity_table')]
-class TestEntityClassWithTable
-{
 }
