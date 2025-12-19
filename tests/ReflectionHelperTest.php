@@ -22,7 +22,6 @@ class ReflectionHelperTest extends TestCase
 {
     public function testGetClassReflectionWithString(): void
     {
-        // @phpstan-ignore-next-line 测试覆盖已废弃方法，按需保留
         $reflectionClass = ReflectionHelper::getClassReflection(TestReflectionClass::class);
 
         $this->assertInstanceOf(\ReflectionClass::class, $reflectionClass);
@@ -32,7 +31,6 @@ class ReflectionHelperTest extends TestCase
     public function testGetClassReflectionWithObject(): void
     {
         $object = new TestConcreteReflectionClass();
-        // @phpstan-ignore-next-line 测试覆盖已废弃方法，按需保留
         $reflectionClass = ReflectionHelper::getClassReflection($object);
 
         $this->assertInstanceOf(\ReflectionClass::class, $reflectionClass);
@@ -43,7 +41,6 @@ class ReflectionHelperTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Class 'NonExistent\\Class\\Name' does not exist");
-        // @phpstan-ignore-next-line 测试覆盖已废弃方法，验证异常
         ReflectionHelper::getClassReflection('NonExistent\Class\Name');
     }
 
